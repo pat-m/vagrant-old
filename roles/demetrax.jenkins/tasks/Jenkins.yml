@@ -1,0 +1,68 @@
+- name: Remove apt lock file
+  file:
+    state: absent
+    path: "/var/lib/dpkg/lock-frontend"
+  become: true
+  tags: apt
+
+- name: Update all packages to the latest version
+  apt:
+    upgrade: "full"
+  become: true
+  tags: apt
+
+- name: Install packages
+  apt:
+    name:
+      - openjdk-11-jdk
+      - curl
+      - apt-transport-https
+      - gnupg
+  become: yes
+
+- name: Add Jenkins key
+  apt_key:
+    url: "https://pkg.jenkins.io/debian-stable/jenkins.io.key"
+    state: present
+  become: true
+
+- name: Add Jenkins repository
+  apt_repository:
+    repo: 'deb https://pkg.jenkins.io/debian-stable binary/'
+    state: present
+  become: true
+
+- name: Update and upgrade apt packages
+  apt:
+    upgrade: "yes"
+    update_cache: yes
+
+- name: Install Jenkins binary package
+  apt:
+    name: "jenkins"
+    update_cache: true
+  become: true
+
+- name: Start & Enable Jenkins
+  systemd:
+    name: jenkins
+    state: started
+    enabled: true
+  become: true
+
+- name: Sleep for 30 seconds and continue with play
+  wait_for:
+    timeout: 30
+  become: true
+
+
+
+
+#    - name: Ensure Jenkins is running on the specified port.
+#      uri:
+#        url: "http://127.0.0.1:8080"
+#        status_code: 200
+#      register: result
+#      until: result.status == 200
+#      retries: 5
+#      delay: 1

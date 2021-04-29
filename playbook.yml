@@ -1,0 +1,13 @@
+# Jenkins Playbook
+- name: Init Devops Machine
+  hosts: devops
+  become: yes
+  vars_files:
+    - roles/demetrax.jenkins/vars/default.yml
+    - roles/demetrax.httpd/vars/default.yml
+    - roles/demetrax.mysql/vars/default.yml
+  roles:
+    - demetrax.jenkins
+    - demetrax.httpd
+    #- demetrax.mysql
+
