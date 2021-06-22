@@ -1,0 +1,11 @@
+jenkins_admin: "admin@example.com"
+jenkins_url: "http://localhost:8080"
+jenkins_admin_username: admin
+jenkins_admin_password: admin
+jenkins_username: user
+jenkins_password: user
+requirements: python-apt
+jenkins_plugin:
+jenkins_host: http://localhost:8080
+jenkins_jobs:
+  - "my-first-job"

@@ -1,0 +1,6 @@
+mysql_root_password: 'root'
+mysql_user: 'user'
+mysql_password: 'user'
+mysql_dbname: 'incredible_tasklist_bdd'
+webserver_host: 'localhost'
+ansible_python_interpreter: '/usr/bin/python3'

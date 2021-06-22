@@ -1,0 +1,34 @@
+- name: Add PHP Repositories
+  become: true
+  apt_repository:
+    validate_certs: no
+    repo: 'ppa:ondrej/php'
+    state: present
+
+- name: Update and Upgrade Packages
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: install PHP 8.0
+  become: true
+  apt:
+    name:
+      - php8.0
+      - libapache2-mod-php8.0
+      - php8.0-fpm
+      - libapache2-mod-fcgid
+      - php8.0-curl
+      - php8.0-dev
+      - php8.0-gd
+      - php8.0-mbstring
+      - php8.0-zip
+      - php8.0-mysql
+      - php8.0-xml
+
+#- name: Add PHP Info File
+#  become: true
+#  template:
+#    src: "index.php.j2"
+#    dest: "/var/www/html/index.php"

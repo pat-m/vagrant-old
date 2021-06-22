@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+        ServerName www.{{ http_host }}
+        ServerAdmin webmaster@{{ http_host }}
+        DocumentRoot /var/www/html/{{ http_host }}/public
+        DirectoryIndex /index.php
+        <Directory /var/www/html/{{ http_host }}/public>
+        AllowOverride None
+        Order Allow,Deny
+        Allow from All
+
+        <IfModule mod_rewrite.c>
+            Options -MultiViews
+            RewriteEngine On
+            RewriteCond %{REQUEST_FILENAME} !-f
+            RewriteRule ^(.*)$ index.php [QSA,L]
+        </IfModule>
+    </Directory>
+
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
+        SetEnv APP_ENV prod
+</VirtualHost>

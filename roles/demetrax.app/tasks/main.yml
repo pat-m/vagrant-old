@@ -1,0 +1,78 @@
+
+- name: Clear Index Apache
+  become: true
+  command: rm -rf /var/www/html
+
+- name: Clone project incredible-tasklist from github
+  become: true
+  ansible.builtin.git:
+    repo: https://github.com/pat-m/incredible-tasklist.git
+    dest: /var/www/html/{{ http_host }}
+    single_branch: yes
+    version: main
+
+- name: Install Nodejs and Utilities
+  become: true
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - nodejs
+    - zip
+    - unzip
+    - npm
+
+- name: Download Composer
+  become: true
+  script: roles/demetrax.app/script/install_composer.sh
+
+- name: Move Composer globally
+  become: true
+  command: mv composer.phar /usr/local/bin/composer
+
+#- name: Symfony set Env Prod
+#  become: true
+#  command: cp {{ symfony_root_dir }}/.env.prod {{ symfony_root_dir }}/.env
+
+- name: Symfony Composer Install
+  become: yes
+  become_user: root
+  become_method: sudo
+  community.general.composer:
+    working_dir: /var/www/html/{{ http_host }}
+    global_command: false
+
+- name: Create DB if not exists
+  become: true
+  command: "{{ symfony_console_path }} doctrine:database:create --if-not-exists"
+
+- name: Execute migrations
+  become: true
+  command: "{{ symfony_console_path }} doctrine:migrations:migrate --no-interaction"
+
+- name: Add Yarn apt key
+  become: true
+  apt_key:
+    url: https://dl.yarnpkg.com/debian/pubkey.gpg
+
+- name: Add Yarn repository
+  become: true
+  apt_repository:
+    repo: "deb https://dl.yarnpkg.com/debian/ stable main"
+    filename: yarn
+
+- name: Install Yarn
+  become: true
+  apt:
+    name: yarn
+
+- name: Install packages based on package.json.
+  become: true
+  community.general.yarn:
+    path: /var/www/html/{{ http_host }}
+
+- name: Install packages based on package.json.
+  become: true
+  shell:
+    chdir: /var/www/html/{{ http_host }}
+    cmd: yarn encore production
+

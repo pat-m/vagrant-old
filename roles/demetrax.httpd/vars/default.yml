@@ -1,0 +1,9 @@
+app_user: "jenkins"
+http_host: "incredible-tasklist"
+http_conf: "incredible-tasklist.conf"
+http_port: "80"
+disable_default: true
+db_host: localhost:8082
+mysql_dbname: 'incredible_tasklist_bdd'
+mysql_user: 'user'
+mysql_password: 'user'

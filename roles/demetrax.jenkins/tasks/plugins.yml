@@ -1,0 +1,24 @@
+# Jenkins master: install plugins
+- name: Install Jenkins Plugins
+  become: true
+  jenkins_plugin:
+    name: "{{ item }}"
+    url: http://localhost:8080
+    url_username: "{{jenkins_admin_username}}"
+    url_password: "{{jenkins_admin_password}}"
+    with_dependencies: yes
+  register: plugin_result
+  until: plugin_result is success
+  retries: 10
+  delay: 5
+  with_items: # no version = latest
+    - "git"
+    - "github"
+    - "github-branch-source"
+    - "workflow-aggregator"
+    - "workflow-cps"
+    - "greenballs"
+    - "blueocean"
+    - "credentials"
+    - "docker-plugin"
+    - "docker-workflow"

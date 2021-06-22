@@ -1,0 +1,67 @@
+- name: Update and Upgrade Packages
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400
+
+- name: Install Apache
+  become: true
+  apt:
+    name:
+      - apache2
+
+- name: Define Rights on Apache Folder
+  become: true
+  file:
+    path: /var/www/html
+    state: directory
+    owner: "vagrant"
+    group: "vagrant"
+    mode: "0755"
+
+- name: Checking Apache Service is Started
+  become: true
+  service:
+    name: apache2
+    state: started
+    enabled: yes
+
+- name: Enable Rewrite Module
+  apache2_module:
+    state: present
+    name: rewrite
+
+- name: Remove default index.html
+  file:
+    path: /var/www/html/index.html
+    state: absent
+
+- name: Create document root for the domain
+  file:
+    path: "/var/www/html/{{ http_host }}"
+    state: directory
+    owner: "vagrant"
+    group: "vagrant"
+    mode: "0755"
+
+- name: Add Vhost.
+  template:
+    src: vhost.conf.j2
+    dest: "/etc/apache2/sites-available/{{ http_conf }}"
+  notify: Restart Apache
+
+- name: Enable new site {{ http_conf }}
+  shell: /usr/sbin/a2ensite {{ http_conf }}
+  args:
+    creates: /etc/apache2/sites-enabled/{{ http_conf }}
+  notify: Reload Apache
+
+
+- name: Disable default site
+  shell: /usr/sbin/a2dissite 000-default.conf
+  notify: Reload Apache
+
+- name: "UFW Firewall Allow HTTP on Port {{ http_port }}"
+  ufw:
+    rule: allow
+    port: "{{ http_port }}"
